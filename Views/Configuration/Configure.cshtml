@@ -1,0 +1,384 @@
+﻿@model Nop.Search.Plugin.GSA.Model.ConfigModel
+@using Nop.Web.Framework;
+@using Nop.Web.Framework.UI;
+@using Nop.Core.Infrastructure
+@using Nop.Services.Localization;
+
+@{
+    Layout = "";
+    var defaultGridPageSize = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>
+    ().DefaultGridPageSize;
+    var gridPageSizes = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>
+        ().GridPageSizes;
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="content">
+        <div class="form-horizontal">
+            <div id="customer-edit" class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                   @Html.RenderBootstrapTabHeader("tab-general", @T("Nop.Search.Plugin.GSA.Tab.General"), true)
+                   @if(Model.isGsa) { 
+                    @Html.RenderBootstrapTabHeader("tab-gsa", @T("Nop.Search.Plugin.GSA.Tab.GsaConfig"))
+                    }
+                    @if(Model.IsElastic) { 
+                    @Html.RenderBootstrapTabHeader("tab-elastic", @T("Nop.Search.Plugin.GSA.Tab.ElasticSearchConfig"))
+                    }
+                </ul>
+                <div class="tab-content">
+                    @Html.RenderBootstrapTabContent("tab-general", @TabGeneral(), true)
+                   @Html.RenderBootstrapTabContent("tab-gsa", @TabGsa())
+                    @Html.RenderBootstrapTabContent("tab-elastic", @TabElastic())
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @helper TabGeneral()
+    {
+        <div class="panel-group">
+            <h1>@T("Nop.Search.Plugin.GSA.Config.SearchEngine")</h1>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.isGsa)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.isGsa)
+                            @Html.ValidationMessageFor(model => model.isGsa)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.IsElastic)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.IsElastic)
+                            @Html.ValidationMessageFor(model => model.IsElastic)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            &nbsp;
+                        </div>
+                        <div class="col-md-9">
+                            <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        $(document).ready(function() {
+            $('#IsElastic').click(function () {
+                if ($(this).is(':checked')) {
+                    $("#isGsa").attr('checked', false)
+            }
+            });
+            $('#isGsa').click(function () {
+                if ($(this).is(':checked')) {
+                    $("#IsElastic").attr('checked', false)
+                }
+
+            });
+        });
+        </script>
+    }
+    @helper TabGsa() { 
+    <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.GsaHost)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.GsaHost)
+                            @Html.ValidationMessageFor(model => model.GsaHost)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.Collection)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.Collection)
+                            @Html.ValidationMessageFor(model => model.Collection)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.FrontEndClient)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.FrontEndClient)
+                            @Html.ValidationMessageFor(model => model.FrontEndClient)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.AccessType)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopDropDownListFor(model => model.AccessType, Model.AcessTypes)
+                            @Html.ValidationMessageFor(model => model.AccessType)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.OutputOption)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopDropDownListFor(model => model.OutputOption, Model.OutputOptions)
+                            @Html.ValidationMessageFor(model => model.OutputOption)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.MaxSearchResults)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.MaxSearchResults)
+                            @Html.ValidationMessageFor(model => model.MaxSearchResults)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.SortFormat)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopDropDownListFor(model => model.SortFormat, Model.SortFormats)
+                            @Html.ValidationMessageFor(model => model.SortFormat)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.ResultsPerPage)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.ResultsPerPage)
+                            @Html.ValidationMessageFor(model => model.ResultsPerPage)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.NopLabelFor(model => model.ImageHost)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.ImageHost)
+                            @Html.ValidationMessageFor(model => model.ImageHost)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            &nbsp;
+                        </div>
+                        <div class="col-md-9">
+                            <input type="submit" name="save" class="btn bg-blue" value="@T(" Admin.Common.Save")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+    @helper TabElastic()
+    {
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.NopLabelFor(model => model.ElasticHost)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.NopEditorFor(model => model.ElasticHost)
+                        @Html.ValidationMessageFor(model => model.ElasticHost)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.NopLabelFor(model => model.SearchIndex)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.NopEditorFor(model => model.SearchIndex)
+                        @Html.ValidationMessageFor(model => model.SearchIndex)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.NopLabelFor(model => model.SearchKey)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.NopEditorFor(model => model.SearchKey)
+                        @Html.ValidationMessageFor(model => model.SearchKey)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.NopLabelFor(model => model.EResultsPerPage)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.NopEditorFor(model => model.EResultsPerPage)
+                        @Html.ValidationMessageFor(model => model.EResultsPerPage)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        &nbsp;
+                    </div>
+                    <div class="col-md-9">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+}
+
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div id="collectionMapping"></div>
+        <script>
+                    $(document).ready(function () {
+                        $("#collectionMapping").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: '@Html.Raw(Url.Action("CollectionMappingList", "Configuration"))',
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                    update: {
+                                        url: '@Html.Raw(Url.Action("CollectionMappingUpdate", "Configuration"))',
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                    create: {
+                                        url: '@Html.Raw(Url.Action("CollectionMappingInsert", "Configuration"))',
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                    destroy: {
+                                        url: '@Html.Raw(Url.Action("CollectionMappingDelete", "Configuration"))',
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                },
+
+                                requestEnd: function (e) {
+                                    if (e.type == "update" || e.type == "create") {
+                                        this.read();
+                                    }
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors",
+                                    model: {
+                                        id: "Id",
+                                        fields: {
+                                            LanguageCulture: { editable: true, type: "string", validation: { required: true } },
+                                            Collection: { editable: true, type: "string", validation: { required: true } }
+                                        }
+                                    }
+                                },
+                                pageSize: '@defaultGridPageSize',
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            columns: [
+                                {
+                                    field: "LanguageCulture",
+                                    title: '@T("Nop.Search.Plugin.GSA.LanguageCulture")',
+                                    editor: storeDropDownEditor,
+                                },
+
+                                {
+                                    field: "Collection",
+                                    title: '@T("Nop.Search.Plugin.GSA.Collection")',
+                                },
+
+                                { command: [{
+                                    name: "edit",
+                                    text: {
+                                        edit: "@T("Admin.Common.Edit")",
+                                    update: "@T("Admin.Common.Update")",
+                                    cancel: "@T("Admin.Common.Cancel")"
+                    }
+                    },
+                    {
+                    name: "destroy",
+                    text: "@T("Admin.Common.Delete")"
+                    }], title: "&nbsp;", width: "250px" },
+                            ],
+                            editable: "inline",
+                            toolbar: [{ name: "create", text: "@T("Admin.Common.AddNewRecord")" }],
+                            scrollable: false
+                        });
+                    });
+
+
+
+            var allStores = [
+                             {
+                                 Id: 0,
+                                 Name: "Select"
+                             }
+                                         @{
+                            var langService = EngineContext.Current.Resolve<ILanguageService>();
+                            var allLang = langService.GetAllLanguages();
+                            }
+                                @foreach (var lang in allLang)
+                            {
+                                <text>
+                                            , {
+                                Id: "@(Html.Raw(HttpUtility.JavaScriptStringEncode(lang.LanguageCulture)))",
+                                Name: "@(Html.Raw(HttpUtility.JavaScriptStringEncode(lang.Name)))"
+                            }
+                            </text>
+                            }
+                            ];
+                            function storeDropDownEditor(container, options) {
+                                $('<input required data-text-field="Name" data-value-field="Id" data-bind="value:LanguageCulture"/>')
+                                    .appendTo(container)
+                                    .kendoDropDownList({
+                                        autoBind: false,
+                                        dataSource: allStores
+                                    });
+                            }
+        </script>
+    </div>
+</div>
+
+

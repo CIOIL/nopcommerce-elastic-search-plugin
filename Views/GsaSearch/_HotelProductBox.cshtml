@@ -1,0 +1,125 @@
+﻿@model Nop.Search.Plugin.GSA.Model.SearchResultModel.Results
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+@using System.Globalization;
+
+@using Nop.Services.Configuration
+@using Nop.Search.Plugin.GSA.Infrastructure.Settings;
+@{
+    var workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var setting = EngineContext.Current.Resolve<ISettingService>().LoadSetting<GsaSetting>();
+    string productId = "null";
+    var productName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Name")).FirstOrDefault().Value;
+    if (Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")) != null) {
+        productId = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")).FirstOrDefault().Value;
+    }
+    var picUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Pic_Url")).FirstOrDefault().Value.Replace("info.goisrael.com", setting.ImageHost);
+    var productUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Product_Url")).FirstOrDefault().Value;
+    var sourceUrl = "https://" + Model.ResuslAttributes.Where(x => x.Attribute.Equals("SourceUrl")).FirstOrDefault().Value + "/" + workContext.WorkingLanguage.LanguageCulture.Split('-')[0];
+    var hotelClassification = new String(Model.ResuslAttributes.Where(x => x.Attribute.Equals("Hotel_Classification")).FirstOrDefault().Value.ToCharArray().Where(c => Char.IsDigit(c)).ToArray());
+    var zimmerSerRibonField = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Zimmer_ser_ribon_field")).FirstOrDefault().Value;
+    var parentUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentUrl")).FirstOrDefault().Value;
+    var childUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Url")).FirstOrDefault().Value;
+    var parentName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentName")).FirstOrDefault().Value;
+    var childName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Name")).FirstOrDefault().Value;
+    var shortDescription = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ShortDescription")).FirstOrDefault().Value;
+    var updatedOnUtc = Model.ResuslAttributes.Where(x => x.Attribute.Equals("UpdatedOnUtc")).FirstOrDefault().Value;
+    var mainCategoryDefault = Model.ResuslAttributes.Where(x => x.Attribute.Equals("CategoryNameDefault")).FirstOrDefault().Value;
+
+    var display = String.Empty;
+    var lastUpdate = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Last_updated")).FirstOrDefault().Value.Trim();
+
+
+
+    if (!lastUpdate.Equals("null") && lastUpdate.Split('-').Length == 3)
+    {
+        DateTime time = new DateTime(Convert.ToInt32(lastUpdate.Split('-')[2]), Convert.ToInt32(lastUpdate.Split('-')[1]), Convert.ToInt32(lastUpdate.Split('-')[0]));
+        lastUpdate = time.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture));
+    }
+    else
+    {
+        lastUpdate = Model.ResuslAttributes.Where(x => x.Attribute.Equals("UpdatedOnUtc")).FirstOrDefault().Value;
+        DateTime myDate = DateTime.Parse(lastUpdate);
+        lastUpdate = myDate.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture));
+    }
+
+    /*Get logo path data*/
+    var currentThemeName = EngineContext.Current.Resolve<IThemeContext>().WorkingThemeName;
+
+    var logoPath = sourceUrl + "/Themes/"+ "GoIsrael" +"/Content/css/images/Logos/" + workContext.WorkingLanguage.fr + ".png";
+
+    if (picUrl == "null") { picUrl = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png"; }
+    var errPic = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png";
+}
+<div class="product-item">
+    <div class="picture">
+        <a href="@productUrl" title="@productName" target="_blank">
+            <img alt="@productName" src="@picUrl" title="@productName" onerror="this.src = '@errPic';"/>
+        </a>
+    </div>
+    <div class="details">
+        <div class="logo-title">
+            <div class="center-all title-text">
+                <h5><a href="@productUrl" target="_blank" title="@productName">@productName</a></h5>
+            </div>
+            
+            @if (mainCategoryDefault.Equals("Hotels") && hotelClassification != "")
+            {
+                <div class="rating  star-icon direction-ltr value-@hotelClassification /*theme-kununu*/ theme-google-places hotel-stars">
+                <div class="star-container">
+                    <div class="star">
+                        <i class="star-empty"></i>
+                        <i class="star-half"></i>
+                        <i class="star-filled"></i>
+                    </div>
+                    <div class="star">
+                        <i class="star-empty"></i>
+                        <i class="star-half"></i>
+                        <i class="star-filled"></i>
+                    </div>
+                    <div class="star">
+                        <i class="star-empty"></i>
+                        <i class="star-half"></i>
+                        <i class="star-filled"></i>
+                    </div>
+                    <div class="star">
+                        <i class="star-empty"></i>
+                        <i class="star-half"></i>
+                        <i class="star-filled"></i>
+                    </div>
+                    <div class="star">
+                        <i class="star-empty"></i>
+                        <i class="star-half"></i>
+                        <i class="star-filled"></i>
+                    </div>
+
+                </div>
+            </div>
+            }
+            else
+            {
+                if (!zimmerSerRibonField.Equals("null"))
+                {
+                <div class="classification">
+                    <img src="\Plugins\GSA\Content\Css\images\ribbon-image.png" class="ribbon-image">
+                    <label class="zimmer-ribon">@zimmerSerRibonField</label>
+                </div>
+                    }
+                }
+
+            <div  class="center-all logo-img">
+                <a href="@sourceUrl" title="@sourceUrl" target="_blank">
+                    <img alt="https://@sourceUrl" src="@logoPath" title="@sourceUrl" class="source-logo" />
+                </a>
+            </div>
+        </div>
+        <div class="center-all space category">
+            <a href="@parentUrl" target="_blank"><strong>@parentName</strong></a><span> >> </span> 
+            <a href="@childUrl" target="_blank"><strong>@childName</strong></a>
+        </div>
+        <div class="short-desc" title="@shortDescription">@shortDescription</div>
+        <div class="center-all space url"> <a href="@productUrl" title="@productName" target="_blank"> @productUrl </a></div>
+        <div class="center-all space update"> @T("Nop.Search.Plugin.GSA.Search.LastUpdate") @lastUpdate </div>
+    </div>
+</div>

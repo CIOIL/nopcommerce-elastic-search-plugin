@@ -1,0 +1,123 @@
+﻿@model Nop.Search.Plugin.GSA.Model.ElasticSearchResultModel.ElasticResult
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@{
+    var supportRtl = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Rtl;
+
+    if (supportRtl)
+    {
+        Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/ElasticRTL.css");
+    }
+    else
+    {
+        Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/ElasticRTL.css");
+    }
+    //Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/star-rating.css");
+    //Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/ResponsiveGsa.css");
+}
+
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //var results = Model.TotalResults;
+
+
+}
+
+@helper  GetTextSize(string text)
+{
+if (text.Length == 0)
+{
+    return;
+
+}
+var firstAppearance = text.IndexOf(Request.Params["q"]);
+string fullText = text;
+try
+{
+    if (firstAppearance >= 0)
+    {
+        var substringBefore = text.Substring(((80 - firstAppearance) < 0 ? (firstAppearance - 80) : (80 - firstAppearance)), 80);
+        var substringAfter = text.Substring(firstAppearance, Math.Min(text.Length - firstAppearance, 60));
+        fullText = substringBefore + " " + substringAfter;
+    }
+    else
+    {
+        fullText = text.Substring(0, text.Length < 140 ? text.Length : 140);
+    }
+}
+catch { }
+var splitRequest = Request.Params["q"].Split(' ');
+foreach (var s in splitRequest)
+{
+    fullText = fullText.Replace(s, "<span style='background-color:yellow'>" + s + "</span>");
+}
+    <h4>"... @Html.Raw(fullText) ..."</h4>
+
+}
+
+<div style="background-color:#333;color:white;padding:10px"><span style="font-size:15px;">@T("Nop.Search.Plugin.GSA.Search.Result") : </span><span style="font-style:italic;font-size:15px;">@Request.Params["q"]</span></div>
+<div><span style="padding-top:5px;"><strong>@T("Nop.Search.Plugin.GSA.Search.TotalResults") : @Model.TotalResults</strong></span></div>
+<div id="search-results">
+
+    @if (Model.TotalResults > 0)
+    {
+        foreach (var item in Model.Results)
+        {
+            <div class="product-item">
+                <div class="picture">
+                    <a href="@Url.RouteUrl("Product", new { SeName = item.SeName }, this.Request.Url.Scheme)" title="@item.DefaultPictureModel.Title" target="_blank">
+                        <img alt="@item.DefaultPictureModel.AlternateText" src="@item.DefaultPictureModel.ImageUrl" title="@item.DefaultPictureModel.Title" style="width:150px" />
+                    </a>
+                </div>
+
+                <div class="details">
+                    <div class="center-all title-text">
+                        <a href="@Url.RouteUrl("Product", new { SeName = item.SeName }, this.Request.Url.Scheme)" title="@item.DefaultPictureModel.Title" target="_blank">
+                            <h4>@item.Name</h4>
+                        </a>
+                    </div>
+                    @if (@item.SpecificationAttributeModels.FirstOrDefault() != null)
+                    {
+                        <div class="center-all title-text" style="padding-top:5px">
+                            <h4>@item.SpecificationAttributeModels.FirstOrDefault().SpecificationAttributeName  : <span> @item.SpecificationAttributeModels.FirstOrDefault().ValueRaw</span></h4>
+                        </div>
+                    }
+                    <div class="center-all title-text" style="padding-top:5px">
+                        @GetTextSize(item.ShortDescription)
+                    </div>
+                    @if (!String.IsNullOrEmpty(item.CustomProperties["link_to_documnet"].ToString()))
+                    {
+                        <div class="center-all title-text" style="padding-top:10px">
+                            <a href='/Content/Files/Attachments/@item.CustomProperties["link_to_documnet"]#page=@item.CustomProperties["page_number"]' target="_blank"><h4>קישור למסמך</h4></a>
+                        </div>
+                    }
+                    <div class="center-all title-text" style="padding-top:5px">
+                        <a href="@Url.RouteUrl("Product", new { SeName = item.SeName }, this.Request.Url.Scheme)" title="@item.DefaultPictureModel.Title" target="_blank">
+                            <h4>קישור לדף הפריט</h4>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+    }
+
+
+
+
+
+
+
+    @{
+        var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber").RenderEmptyParameters(false);
+    }
+    @if (!pager.IsEmpty())
+    {
+        <div class="pager" style="padding-top:5px;">
+            @pager
+        </div>
+    }
+    @Html.Widget("productsearch_page_after_results")
+</div>

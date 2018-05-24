@@ -1,0 +1,184 @@
+﻿
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
+@import url('https://fonts.googleapis.com/css?family=Assistant&subset=hebrew');
+
+#search-results .quick-view-button {
+    display: none !important;
+}
+
+#search-results .item-box {
+    /*  height:140px !important;*/
+}
+
+    #search-results .item-box .picture {
+        width: 160px !important;
+        height: 160px !important;
+        display: inline !important;
+    }
+
+        #search-results .item-box .picture img {
+            max-width: unset !important;
+        }
+
+#search-results .product-list .item-box .details {
+    width: 100%;
+    float: none;
+    clear: both;
+    display: inline !important;
+}
+
+.source-logo {
+    width: 140px;
+    padding-left: 5px;
+}
+
+.logo-title {
+    display: -webkit-flex;
+    -webkit-flex-direction: column-reverse;
+    display: flex;
+    flex-direction: row;
+}
+
+.short-desc {
+    font-size: 12px !important;
+    height: 2.3em;
+    line-height: 1.1em;
+    overflow: hidden;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: 300 !important;
+}
+
+.category, .short-desc, .update, .url, .photographer, .event {
+    font-family: 'Open Sans', Assistant;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.space {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+/*Hote and B&B Template css*/
+.title-text {
+    width: 100%;
+    padding-left: 5px;
+    padding-right: 5px;
+    font: 1.4vw/20px 'Open Sans', Assistant;
+}
+
+    .title-text a {
+        text-decoration: underline;
+        font: 1.0vw 'Open Sans', Assistant;
+        font-weight:bold;
+
+    }
+
+
+.category span {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.category a:hover, .url a:hover {
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.zimmer-ribon {
+    font-family: 'Open Sans',Assistant;
+    color: white;
+    position: absolute;
+    padding-left: 8px;
+    vertical-align: middle;
+    font-weight: bold;
+    top:1px;
+}
+
+.ribbon-image {
+    width: auto;
+    height: 25px;
+}
+
+/* Picture Template CSS*/
+.title-picture, .title-forecast {
+    width: 100%;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-family: 'Open Sans', Assistant !important;
+}
+.title-picture a , .title-forecast a {
+    text-decoration:underline;
+        font-family: 'Open Sans', Assistant !important;
+}
+.event span {
+    padding-right: 7px;
+}
+
+
+/*Forecast Details*/
+.pr-description {
+    display: inline-block;
+    width: 35%;
+}
+
+.forecast-details {
+    display: inline-block;
+    width: 40%;
+    vertical-align: top;
+}
+
+.forecast-current {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+}
+
+.foreacst-future {
+    display: inline-block;
+    width: 48%;
+    vertical-align: top;
+    font-size: x-small;
+    font-weight: bold;
+    font-family: 'Open Sans',Assistant;
+}
+
+.today {
+    font-family: 'Open Sans',Assistant;
+    font-weight: bold;
+    font-size: small;
+}
+
+.forecast {
+    /*width:59% !important;*/
+}
+
+.foreacst-future span {
+    padding: 10px;
+    vertical-align: top;
+}
+
+/* Exchange rate */
+.exchange {
+    line-height: 2em;
+}
+.logo-img
+{
+    text-align:right;
+}
+.forecast-future-size
+{
+	width:30px;
+}
+.forecast-size
+{
+	width:64px;
+}
+/* Master Page Design
+.master-home-page .master-column-wrapper
+{
+    margin:unset !important;
+}*/
+
+/* Riboon Products */
+

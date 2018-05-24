@@ -1,0 +1,97 @@
+﻿@model Nop.Search.Plugin.GSA.Model.SearchResultModel
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@{
+    var supportRtl = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Rtl;
+
+    if (supportRtl)
+    {
+        Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/GsaRTL.css");
+    }
+    else
+    {
+        Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/GsaLTR.css");
+    }
+    Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/star-rating.css");
+    Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/GSA/Content/Css/ResponsiveGsa.css");
+}
+
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    var results = Model.TotalResults;
+
+
+}
+
+<div style="background-color:#333;color:white;padding:2px"><span>@T("Nop.Search.Plugin.GSA.Search.Result") : </span><span style="font-style:italic">@Request.Params["q"]</span></div>
+<div><span style="padding-top:5px;"><strong>@T("Nop.Search.Plugin.GSA.Search.TotalResults") : @results</strong></span></div>
+<div id="search-results">
+    @if (Model.TotalResults > 0)
+    {
+        <div class="product-list">
+            <div class="item-grid">
+                @foreach (var product in Model.GsaResult)
+                {
+                    <div class="item-box">
+                        @*@Html.Partial("~/Plugins/GSA/Views/GsaSearch/_HotelProductBox.cshtml", product)*@
+                        @if (product.ResuslAttributes.Where(x => x.Attribute.Equals("SourceUrl")).FirstOrDefault().Value.Equals("goisrael.com"))
+                        {
+                            @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_NewGoIsraelProductBox.cshtml", product)
+                        }
+                        else
+                        {
+                            switch (product.ResuslAttributes.Where(x => x.Attribute.Equals("CategoryNameDefault")).FirstOrDefault().Value)
+                            {
+                                case "Hotels":
+                                case "B&B":
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_HotelProductBox.cshtml", product)
+                                    break;
+                                case "Picture Gallery":
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_PictureProductBox.cshtml", product)
+                                    break;
+                                case "Events":
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_EventProductBox.cshtml", product)
+                                    break;
+                                case "Forecast":
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_ForecastProductBox.cshtml", product)
+                                    break;
+                                case "Exchange rates":
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_ExchangeProductBox.cshtml", product)
+                                    break;
+                                default:
+                                    @Html.Partial("~/Plugins/GSA/Views/GsaSearch/_GeneralProductBox.cshtml", product)
+                                    break;
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div style="background-color:#333;color:white;padding:2px">
+            <span>
+                @T("Nop.Search.Plugin.GSA.Search.DisplayResult").Text.Replace("{0}", Model.EndResultNum.ToString()).Replace("{1}", results.ToString())
+            </span>
+        </div>
+
+    }
+
+    else
+    {
+        <div class="no-result">
+            @T("Search.NoResultsText")
+        </div>
+    }
+    @{
+        var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber").RenderEmptyParameters(false);
+    }
+    @if (!pager.IsEmpty())
+            {
+        <div class="pager" style="padding-top:5px;">
+            @pager
+        </div>
+    }
+
+
+    @Html.Widget("productsearch_page_after_results")
+</div>

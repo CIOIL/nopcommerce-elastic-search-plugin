@@ -1,0 +1,59 @@
+﻿@model Nop.Search.Plugin.GSA.Model.SearchResultModel.Results
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+@using System.Globalization;
+@using System.Text.RegularExpressions;
+@{
+    var workContext = EngineContext.Current.Resolve<IWorkContext>();
+    string productId = "null";
+    var productName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Name")).FirstOrDefault().Value;
+
+    /*Split by Capital letters */
+    var r = new Regex(@"(?<=[A-Z])(?=[A-Z][a-z]) |
+                 (?<=[^A-Z])(?=[A-Z]) |
+                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
+    productName = r.Replace(productName, " ");
+
+    var picUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Pic_Url")).FirstOrDefault().Value;
+    var productUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Product_Url")).FirstOrDefault().Value;
+    var sourceUrl = "https://" + Model.ResuslAttributes.Where(x => x.Attribute.Equals("SourceUrl")).FirstOrDefault().Value + "/" + workContext.WorkingLanguage.LanguageCulture.Split('-')[0];
+
+
+    var shortDescription = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ShortDescription")).FirstOrDefault().Value;
+
+    //var lastUpdate = Model.ResuslAttributes.Where(x => x.Attribute.Equals("UpdatedOnUtc")).FirstOrDefault().Value;
+    //DateTime myDate = DateTime.Parse(lastUpdate);
+    //lastUpdate = myDate.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture));
+
+    /*Get logo path data*/
+    var currentThemeName = EngineContext.Current.Resolve<IThemeContext>().WorkingThemeName;
+    var logoPath = sourceUrl + "/Themes/"+ "GoIsrael" +"/Content/css/images/Logos/" + workContext.WorkingLanguage.LanguageCulture + ".png";
+    if (picUrl == "null") { picUrl = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png"; }
+    var errPic = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png";
+
+}
+<div class="product-item">
+    <div class="picture">
+        <a href="@productUrl" title="@shortDescription" target="_blank">
+            <img alt="@productName" src="@picUrl" title="@shortDescription" onerror="this.src = '@errPic';"/>
+        </a>
+    </div>
+    <div class="details">
+        <div class="logo-title">
+            <div class="center-all title-picture"  title="@shortDescription">
+                <h5><a href="@productUrl" target="_blank">@productName</a></h5>
+            </div>
+            <div  class="center-all logo-img">
+                <a href="@sourceUrl" title="@sourceUrl" target="_blank">
+                    <img alt="@sourceUrl" src="//goisrael-com.azureedge.net/sites/all/themes/goisrael/images/logo2.png" title="@sourceUrl" class="source-logo" style="width:40%"/>
+                </a>
+            </div>
+        </div>
+        @if(shortDescription != "null") { 
+            <div class="short-desc" title="@shortDescription">@shortDescription</div>
+        }
+        <div class="center-all space url"> <a href="@productUrl" title="@productUrl" target="_blank"> @productUrl </a></div>
+        @*<div class="center-all space update"> @T("Nop.Search.Plugin.GSA.Search.LastUpdate"): @lastUpdate </div>*@
+    </div>
+</div>

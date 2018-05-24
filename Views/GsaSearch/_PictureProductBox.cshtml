@@ -1,0 +1,77 @@
+﻿@model Nop.Search.Plugin.GSA.Model.SearchResultModel.Results
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+@using System.Globalization;
+@using System.Text.RegularExpressions;
+
+@using Nop.Services.Configuration
+@using Nop.Search.Plugin.GSA.Infrastructure.Settings;
+@{
+    var workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var setting = EngineContext.Current.Resolve<ISettingService>().LoadSetting<GsaSetting>();
+    string productId = "null";
+    var productName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Name")).FirstOrDefault().Value;
+
+    var r = new Regex(@"(?<=[A-Z])(?=[A-Z][a-z]) |
+                 (?<=[^A-Z])(?=[A-Z]) |
+                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
+    productName = r.Replace(productName, " ");
+
+
+    if (Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")) != null) {
+        productId = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")).FirstOrDefault().Value;
+    }
+
+    var picUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Pic_Url")).FirstOrDefault().Value.Replace("info.goisrael.com", setting.ImageHost);
+    var productUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Product_Url")).FirstOrDefault().Value;
+    var sourceUrl = "https://" + Model.ResuslAttributes.Where(x => x.Attribute.Equals("SourceUrl")).FirstOrDefault().Value + "/" + workContext.WorkingLanguage.LanguageCulture.Split('-')[0];
+    var hotelClassification = new String(Model.ResuslAttributes.Where(x => x.Attribute.Equals("Hotel_Classification")).FirstOrDefault().Value.ToCharArray().Where(c => Char.IsDigit(c)).ToArray());
+    var zimmerSerRibonField = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Zimmer_ser_ribon_field")).FirstOrDefault().Value;
+    var parentUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentUrl")).FirstOrDefault().Value;
+    var childUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Url")).FirstOrDefault().Value;
+    var parentName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentName")).FirstOrDefault().Value;
+    var childName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Name")).FirstOrDefault().Value;
+    var shortDescription = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ShortDescription")).FirstOrDefault().Value;
+    var updatedOnUtc = Model.ResuslAttributes.Where(x => x.Attribute.Equals("UpdatedOnUtc")).FirstOrDefault().Value;
+    var photographer = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Photographer")).FirstOrDefault().Value;
+    var display = String.Empty;
+
+    DateTime myDate = DateTime.Parse(updatedOnUtc);
+    /*Get logo path data*/
+    var currentThemeName = EngineContext.Current.Resolve<IThemeContext>().WorkingThemeName;
+
+    var logoPath = sourceUrl + "/Themes/"+ "GoIsrael" +"/Content/css/images/Logos/" + workContext.WorkingLanguage.LanguageCulture + ".png";
+
+    if (picUrl == "null") { picUrl = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png"; }
+}
+<div class="product-item" data-productid="@productId">
+    <div class="picture">
+        <a href="@productUrl" title="@productName">
+            <img alt="@productName" src="@picUrl" title="@productName" />
+        </a>
+    </div>
+    <div class="details">
+        <div class="logo-title">
+            <div class="center-all title-picture"  title="@productName">
+                <h5><a href="@productUrl"><i class="fa fa-star-o" aria-hidden="true"></i>@productName</a><i class="fa-star-o" aria-hidden="true"></i></h5>
+            </div>
+            <div class="center-all logo-img">
+                <a href="@sourceUrl" title="@sourceUrl">
+                    <img alt="https://@sourceUrl" src="@logoPath" title="@sourceUrl" class="source-logo" />
+                </a>
+            </div>
+        </div>
+        <div class="center-all space category">
+            <a href="@parentUrl"><strong>@parentName</strong></a><span> >> </span> 
+            <a href="@childUrl"><strong>@childName</strong></a>
+        </div>
+        @if (!photographer.Equals("null"))
+        {
+            <div class="center-all space photographer"> @T("Nop.Search.Plugin.GSA.Search.Photographer") : @photographer</div>
+        }
+        <div class="short-desc" title="@shortDescription">@shortDescription</div>
+        <div class="center-all space url"> <a href="@productUrl" title="@productUrl"> @productUrl.Substring(0, (int)(productUrl.Length*0.5)) ... </a></div>
+        <div class="center-all space update"> @T("Nop.Search.Plugin.GSA.Search.LastUpdate") @myDate.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture)) </div>
+    </div>
+</div>

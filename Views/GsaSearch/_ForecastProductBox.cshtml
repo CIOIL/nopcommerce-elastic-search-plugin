@@ -1,0 +1,142 @@
+﻿@model Nop.Search.Plugin.GSA.Model.SearchResultModel.Results
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+@using System.Globalization;
+@using System.Text.RegularExpressions;
+
+@using Nop.Services.Configuration
+@using Nop.Search.Plugin.GSA.Infrastructure.Settings;
+@{
+    var workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var setting = EngineContext.Current.Resolve<ISettingService>().LoadSetting<GsaSetting>();
+    string productId = "null";
+    var productName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Name")).FirstOrDefault().Value;
+
+    var r = new Regex(@"(?<=[A-Z])(?=[A-Z][a-z]) |
+                 (?<=[^A-Z])(?=[A-Z]) |
+                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
+    productName = r.Replace(productName, " ");
+
+
+    if (Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")) != null)
+    {
+        productId = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ProductId")).FirstOrDefault().Value;
+    }
+
+    var picUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Pic_Url")).FirstOrDefault().Value.Replace("info.goisrael.com", setting.ImageHost);
+    var productUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Product_Url")).FirstOrDefault().Value;
+    var sourceUrl = "https://" + Model.ResuslAttributes.Where(x => x.Attribute.Equals("SourceUrl")).FirstOrDefault().Value + "/" + workContext.WorkingLanguage.LanguageCulture.Split('-')[0];
+    var hotelClassification = new String(Model.ResuslAttributes.Where(x => x.Attribute.Equals("Hotel_Classification")).FirstOrDefault().Value.ToCharArray().Where(c => Char.IsDigit(c)).ToArray());
+    var zimmerSerRibonField = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Zimmer_ser_ribon_field")).FirstOrDefault().Value;
+    var parentUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentUrl")).FirstOrDefault().Value;
+    var childUrl = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Url")).FirstOrDefault().Value;
+    var parentName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_ParentName")).FirstOrDefault().Value;
+    var childName = Model.ResuslAttributes.Where(x => x.Attribute.Equals("C_Name")).FirstOrDefault().Value;
+    var shortDescription = Model.ResuslAttributes.Where(x => x.Attribute.Equals("ShortDescription")).FirstOrDefault().Value;
+    var region = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Region")).FirstOrDefault().Value;
+    var city = Model.ResuslAttributes.Where(x => x.Attribute.Equals("City")).FirstOrDefault().Value;
+
+
+    /*Weather Data*/
+    var today = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Temperature_Today")).FirstOrDefault().Value;
+    var humidity = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Humidity_Today")).FirstOrDefault().Value;
+    var windAndspeed = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Wind_direction_and_speed_Today")).FirstOrDefault().Value;
+    var tommorow = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Temperature_Tomorrow")).FirstOrDefault().Value;
+    var twoDay = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Temperature_day_after_Tomorrow")).FirstOrDefault().Value;
+    var threeDay = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Temperature_two_days_after_Tomorrow")).FirstOrDefault().Value;
+    var lastUpdate = Model.ResuslAttributes.Where(x => x.Attribute.Equals("Last_updated")).FirstOrDefault().Value.Trim();
+    var code1 = Model.ResuslAttributes.Where(x => x.Attribute.Equals("WeatherCode1")).FirstOrDefault().Value.Trim() + ".png";
+    var code2 = Model.ResuslAttributes.Where(x => x.Attribute.Equals("WeatherCode2")).FirstOrDefault().Value.Trim() + ".png";
+    var code3 = Model.ResuslAttributes.Where(x => x.Attribute.Equals("WeatherCode3")).FirstOrDefault().Value.Trim() + ".png";
+    var code4 = Model.ResuslAttributes.Where(x => x.Attribute.Equals("WeatherCode4")).FirstOrDefault().Value.Trim() + ".png";
+
+
+    if (!lastUpdate.Equals("null") && lastUpdate.Split('-').Length == 3)
+    {
+        DateTime time = new DateTime(Convert.ToInt32(lastUpdate.Split('-')[2]), Convert.ToInt32(lastUpdate.Split('-')[1]), Convert.ToInt32(lastUpdate.Split('-')[0]));
+        lastUpdate = time.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture));
+    }
+    else
+    {
+        lastUpdate = Model.ResuslAttributes.Where(x => x.Attribute.Equals("UpdatedOnUtc")).FirstOrDefault().Value;
+        DateTime myDate = DateTime.Parse(lastUpdate);
+        lastUpdate = myDate.ToString("d", CultureInfo.GetCultureInfo(workContext.WorkingLanguage.LanguageCulture));
+    }
+    /*Get logo path data*/
+    var currentThemeName = EngineContext.Current.Resolve<IThemeContext>().WorkingThemeName;
+
+    var logoPath = sourceUrl + "/Themes/" + "GoIsrael" + "/Content/css/images/Logos/" + workContext.WorkingLanguage.LanguageCulture + ".png";
+
+    if (picUrl == "null") { picUrl = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png"; }
+    var errPic = "https://info-goisrael-com.azureedge.net/content/images/thumbs/default-image_270.png";
+    var defWeather = "/Plugins/GSA/Content/Css/images/Weather_Icons/1220.png";
+}
+<div class="product-item">
+    <div class="picture">
+        <a href="@productUrl" title="@productName" target="_blank">
+            <img alt="@productName" src="@picUrl" title="@productName" onerror="this.src = '@errPic';" />
+        </a>
+    </div>
+    <div class="details">
+        <div class="logo-title forecast">
+            <div class="center-all title-forecast" title="@productName">
+                <h5><a href="@productUrl" target="_blank"><span>@productName</span></a></h5>
+            </div>
+            <div class="logo-img">
+                <a href="@sourceUrl" title="@sourceUrl" target="_blank">
+                    <img alt="https://@sourceUrl" src="@logoPath" title="@sourceUrl" class="source-logo" />
+                </a>
+            </div>
+        </div>
+        <div class="pr-description" style="line-height:1.5em">
+            <div class="center-all space category">
+                <a href="@parentUrl" target="_blank"><strong>@parentName</strong></a><span> >> </span>
+                <a href="@childUrl" target="_blank"><strong>@childName</strong></a>
+            </div>
+            <div class="center-all space category">
+                @T("Nop.Search.Plugin.GSA.Search.City") : @city
+            </div>
+            <div class="center-all space category">
+                @T("Nop.Search.Plugin.GSA.Search.Region") : @region
+            </div>
+            <div class="center-all space url"> <a href="@productUrl" title="@productUrl" target="_blank"> @productUrl.Substring(0, productUrl.IndexOf("-"))</a></div>
+            <div class="center-all space update"> @T("Nop.Search.Plugin.GSA.Search.LastUpdate") @lastUpdate </div>
+        </div>
+        <div class="forecast-details">
+            <div class="forecast-current">
+                <label>@T("Nop.Search.Plugin.GSA.Search.Today")</label>
+                <div style="clear:both"></div>
+                <div style="display:inline-block;">
+                    <img src="\Plugins\GSA\Content\Css\images\Weather_Icons\@code1" class="forecast-size" onerror="this.src = '@defWeather';">
+                </div>
+                <div style="display:inline-block;vertical-align:top;" class="today">
+                    <label>@today</label>
+                </div>
+                <div style="clear:both"></div>
+                <div style="display:inline-block;vertical-align:top;font-size:x-small;" class="today">
+                    <label>@humidity</label> <br />
+                    <label>@T("Nop.Search.Plugin.GSA.Search.Humidity")</label>
+                </div>
+                <div style="display:inline-block;vertical-align:top;width:58%;font-size:x-small;" class="today">
+                    <label>@windAndspeed</label><br />
+                    <label>@T("Nop.Search.Plugin.GSA.Search.WindAndSpeed")</label>
+                </div>
+            </div>
+            <div class="foreacst-future">
+                <div>
+                    <div>@T("Nop.Search.Plugin.GSA.Search.Tommorow")</div>
+                    <div><img src="\Plugins\GSA\Content\Css\images\Weather_Icons\@code2" class="forecast-future-size" onerror="this.src = '@defWeather';"><span>@tommorow</span></div>
+                </div>
+                <div>
+                    <div>@T("Nop.Search.Plugin.GSA.Search.Two_days_from")</div>
+                    <div><img src="\Plugins\GSA\Content\Css\images\Weather_Icons\@code3" class="forecast-future-size" onerror="this.src = '@defWeather';"><span>@twoDay</span></div>
+                </div>
+                <div>
+                    @T("Nop.Search.Plugin.GSA.Search.ThreeDaysFrom")
+                    <div><img src="\Plugins\GSA\Content\Css\images\Weather_Icons\@code4" class="forecast-future-size" onerror="this.src = '@defWeather';"><span>@threeDay</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
