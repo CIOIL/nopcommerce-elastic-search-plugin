@@ -3,7 +3,7 @@ FriendlyName: Search Engine
 SystemName: SearchEngine
 Version: 2.0.0.0
 SupportedVersions: 3.90
-Author: Ministry of Tourism IT Department
+Author: Israeli Ministry of Tourism
 DisplayOrder: 3
 FileName: Nop.Search.Plugin.GSA.dll
 Description: Search engine using gsa or elastic search with original search
